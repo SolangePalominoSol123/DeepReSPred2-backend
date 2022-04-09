@@ -12,24 +12,25 @@ COPY . .
 RUN apt-get update && yes | apt-get upgrade
 RUN apt install -y git
 RUN apt-get install -y wget
-#RUN apt install -y build-essential
-#RUN apt-get install -y cmake
-#RUN apt-get install -y build-essential cmake xxd ninja-build
+RUN apt install -y build-essential
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/London
+RUN apt-get install -y cmake
 
 
 RUN mkdir data && mkdir algPrograms
 
 #--------------------------------------DATABASE--------------------------------------
 
-RUN wget https://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pfamA_35.0.tar.gz -o ./data/outputPfam.txt -P ./data/
+#RUN wget https://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pfamA_35.0.tar.gz -o ./data/outputPfam.txt -P ./data/
 #RUN tar -xzvf ./data/pfamA_35.0.tar.gz
 
 #--------------------------------ALGORITHMS COMPONENTS--------------------------------
 
 #hh-suite
 RUN cd ./algPrograms && git clone https://github.com/SolangePalominoSol123/hh-suite.git ./algPrograms && \
-    mkdir -p hh-suite/build && cd hh-suite/build
-#RUN cmake -DCMAKE_INSTALL_PREFIX=. ..  
+    mkdir -p hh-suite/build && cd hh-suite/build && cmake -DCMAKE_INSTALL_PREFIX=. ..  
 #RUN make -j 4 && make install
 
 
