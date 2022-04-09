@@ -1,0 +1,5 @@
+git clone https://github.com/SolangePalominoSol123/DeepReSPred2-backend.git
+
+docker image build -t pruebadrp .
+
+docker run -it pruebadrp /bin/sh
