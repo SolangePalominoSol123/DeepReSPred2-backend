@@ -18,7 +18,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/London
 RUN apt-get install -y cmake
 
-
 RUN mkdir data && mkdir algPrograms
 
 #--------------------------------------DATABASE--------------------------------------
@@ -29,8 +28,12 @@ RUN mkdir data && mkdir algPrograms
 #--------------------------------ALGORITHMS COMPONENTS--------------------------------
 
 #hh-suite
-RUN cd ./algPrograms && git clone https://github.com/SolangePalominoSol123/hh-suite.git ./algPrograms && \
-    mkdir -p hh-suite/build && cd hh-suite/build && cmake -DCMAKE_INSTALL_PREFIX=. ..  
+WORKDIR /home/algPrograms
+
+RUN git clone https://github.com/SolangePalominoSol123/hh-suite.git && \
+    mkdir -p hh-suite/build 
+WORKDIR /home/algPrograms/hh-suite/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=. ..  
 #RUN make -j 4 && make install
 
 
