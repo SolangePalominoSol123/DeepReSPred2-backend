@@ -49,27 +49,25 @@ RUN cmake -DWITH_CUDA=off -DWITH_OMP=off .
 RUN make
 RUN cp ./bin/ccmpred /bin/ccmpred
 
-#CNS
-RUN apt-get install -y flex
-
 #miniconda
 WORKDIR /home/auxiliarPrograms
 RUN yes | /bin/bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
-ENV PATH=$HOME/miniconda/condabin:$PATH
+ENV PATH=/root/miniconda/condabin:/root/miniconda/bin:$PATH
 
-#Modeller
-RUN conda install -y modeller -c salilab    
-ARG MODELLERLIB 
-RUN ls $HOME/miniconda/lib | grep modeller- > ${MODELLERLIB}
-RUN echo "Valor MODELLERLIB= ${MODELLERLIB}"
-ARG MODELLERLICENSE=YYY
-WORKDIR $HOME/miniconda/lib/${MODELLERLIB}/modlib/modeller
-RUN sed -i "s/license = .*/license = r'$MODELLERLICENSE'/" config.py
+#Modeller  
+ARG MODELLERLICENSE=MODELIRANJE
+ENV KEY_MODELLER=${MODELLERLICENSE}
+RUN echo "Valor MODELLERLICENSE= ${MODELLERLICENSE}"
+RUN conda install -y modeller -c salilab  
 
 #Blast-Legacy 
 RUN conda install -y -c bioconda blast-legacy 
 
+#TM-align
+RUN apt-get install -y tm-align
 
+#CNS
+RUN apt-get install -y flex
 
 # Startup to be executable
 #ENTRYPOINT ["nginx", "-g", "daemon off;"]
