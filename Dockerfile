@@ -17,14 +17,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir data && mkdir algPrograms
 
-
 #miniconda
 WORKDIR /home/auxiliarPrograms
-
 
 #CNS
 RUN apt-get install -y flex
 RUN apt-get install -y csh
+RUN apt-get install -y gfortran
 RUN cp ./cns_solve_1.3_all_intel-mac_linux.tar.gz /home/algPrograms
 WORKDIR /home/algPrograms
 RUN gunzip cns_solve_1.3_all_intel-mac_linux.tar.gz
@@ -32,8 +31,11 @@ RUN tar xvf cns_solve_1.3_all_intel-mac_linux.tar
 WORKDIR /home/algPrograms/cns_solve_1.3
 RUN mv .cns_solve_env_sh cns_solve_env.sh
 RUN sed -i "s/CNS_SOLVE=_.*/CNS_SOLVE=\/home\/algPrograms\/cns_solve_1.3/" cns_solve_env.sh
-RUN sed -i "s/CNS_SOLVE '_CNS.*/CNS_SOLVE '\/home\/algPrograms\/cns_solve_1.3'/" cns_solve_env
-RUN csh && source cns_solve_env && make install
+RUN sed -i "s/CNS_SOLVE '_CNS.*/CNS_SOLVE '\/home\/algPrograms\/cns_solve_1.3'/" cns_solve_env 
+#csh , source cns_solve_env , make install
+RUN csh -c source cns_solve_env 
+RUN make -j 4 && make install
 
-# Startup to be executable
-#ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+
+
