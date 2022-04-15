@@ -1,7 +1,9 @@
 git clone https://github.com/SolangePalominoSol123/DeepReSPred2-backend.git
 
-docker image build -t pruebadrp .
+copy cns_solve_1.3_all_intel-mac_linux.tar.gz file into /DeepReSPred2-backend/auxiliarPrograms/ repository directory
 
+#docker image build -t pruebadrp .
+#docker image build --progress=plain --build-arg MODELLERLICENSE=<value_license> -t pruebadrp .
 docker image build --progress=plain -t pruebadrp .
 
 docker run -it pruebadrp /bin/sh
@@ -41,8 +43,7 @@ RUN mkdir data && mkdir algPrograms
 #hh-suite
 WORKDIR /home/algPrograms
 
-RUN git clone https://github.com/SolangePalominoSol123/hh-suite.git && \
-    mkdir -p hh-suite/build 
+RUN git clone https://github.com/SolangePalominoSol123/hh-suite.git && mkdir -p hh-suite/build 
 WORKDIR /home/algPrograms/hh-suite/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=. ..  
 RUN make -j 4 && make install
@@ -66,10 +67,9 @@ RUN yes | /bin/bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
 ENV PATH=/root/miniconda/condabin:/root/miniconda/bin:$PATH
 
 #Modeller  
-ARG MODELLERLIB=MODELIRANJE
-ENV KEY_MODELLER=${MODELLERLIB}
-#RUN ls /root/miniconda/lib | grep modeller- > ${MODELLERLIB}
-RUN echo "Valor MODELLERLIB= ${MODELLERLIB}"
+ARG MODELLERLICENSE=MODELIRANJE
+ENV KEY_MODELLER=${MODELLERLICENSE}
+RUN echo "Valor MODELLERLICENSE= ${MODELLERLICENSE}"
 RUN conda install -y modeller -c salilab  
 
 #Blast-Legacy 
@@ -78,8 +78,19 @@ RUN conda install -y -c bioconda blast-legacy
 #TM-align
 RUN apt-get install -y tm-align
 
+#trying.....
 #CNS
 RUN apt-get install -y flex
+RUN apt-get install -y csh
+RUN cp ./cns_solve_1.3_all_intel-mac_linux.tar.gz /home/algPrograms
+WORKDIR /home/algPrograms
+RUN gunzip cns_solve_1.3_all_intel-mac_linux.tar.gz
+RUN tar xvf cns_solve_1.3_all_intel-mac_linux.tar
+WORKDIR /home/algPrograms/cns_solve_1.3
+RUN mv .cns_solve_env_sh cns_solve_env.sh
+RUN sed -i "s/CNS_SOLVE=_.*/CNS_SOLVE=\/home\/algPrograms\/cns_solve_1.3/" cns_solve_env.sh
+RUN sed -i "s/CNS_SOLVE '_CNS.*/CNS_SOLVE '\/home\/algPrograms\/cns_solve_1.3'/" cns_solve_env
+RUN csh && source cns_solve_env && make install
 
 # Startup to be executable
 #ENTRYPOINT ["nginx", "-g", "daemon off;"]
