@@ -96,7 +96,7 @@ RUN mv .cns_solve_env_sh cns_solve_env.sh
 RUN sed -i "s/CNS_SOLVE=_.*/CNS_SOLVE=\/home\/algPrograms\/cns_solve_1.3/" cns_solve_env.sh
 RUN sed -i "s/CNS_SOLVE '_CNS.*/CNS_SOLVE '\/home\/algPrograms\/cns_solve_1.3'/" cns_solve_env 
 #csh , source cns_solve_env , make install
-RUN csh -c source cns_solve_env 
+RUN csh cns_solve_env 
 RUN make -j 4 && make install
 
 
@@ -110,11 +110,15 @@ RUN sed -i "s/nassign.*/nassign 3000/" readdata
 WORKDIR /home/algPrograms/cns_solve_1.3/intel-x86_64bit-linux/source
 RUN sed -i "s/-funroll-loops.*/-funroll-loops/" Makefile
 #csh , make cns_solve
+RUN csh
+RUN make cns_solve
 WORKDIR /home/algPrograms/cns_solve_1.3
 #csh , source cns_solve_env , make clean , make no-fastm , exit 
+RUN csh cns_solve_env 
+RUN make -j 4 && make clean && make no-fastm && exit
 
-#RUN chmod +x cns_solve_env.sh
-#RUN ./cns_solve_env.sh
+RUN chmod +x cns_solve_env.sh
+RUN ./cns_solve_env.sh
 
 WORKDIR /home/algPrograms/DMPfold/cnsfiles
 RUN chmod +x installscripts.sh
