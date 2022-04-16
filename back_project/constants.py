@@ -10,6 +10,7 @@ EMAIL_TOKEN = ""
 DB_USER=""
 DB_PASS=""
 DB_ADDR=""
+DB_PORT="3306"              #Mysql port is 3306 by default
 DB_NAME=""
 
 #AWS s3 config - True (default) if the back-end env has direct access to aws s3, False to use set variables values in constants_aws.json file

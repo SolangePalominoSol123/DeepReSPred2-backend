@@ -9,9 +9,20 @@ docker image build --progress=plain -t pruebadrp .
 
 docker run -it pruebadrp /bin/sh
 
+--finally execute inititalScripts.sql script in the database.
+
 ####
 #directories in run_repeat_prediction.sh and run_dmpfold.sh are already defined to work in Docker environment.
+####
 
+Database Docker
+docker image build -t pruebadatabase .
+docker run -p 33060:3306 pruebadatabase
+docker exec -it <container_id> bash
+mysql -uroot -p
+
+#----
+docker run -d -p 33060:3306 --name mysql-db -e MYSQL_ROOT_PASSWORD=secret mysql
 
 ###################################################
 # Using ubuntu image as base
@@ -30,6 +41,7 @@ RUN apt install -y git
 RUN apt-get install -y wget
 RUN apt install -y build-essential
 RUN apt-get install -y python3-pip
+RUN apt install -y nginx
 
 #Python 3.7
 RUN apt-get install -y software-properties-common
@@ -181,7 +193,26 @@ WORKDIR /home/algPrograms/DMPfold/bin
 RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithdb
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
 
+#--------------------------------SERVICES CONFIGURATION--------------------------------
 
+#BD-Flask Config
+WORKDIR /home/back_project
+RUN python migrate.py db init
+RUN python migrate.py db migrate
+RUN python migrate.py db upgrade
 
-# Startup to be executable
-#ENTRYPOINT ["nginx", "-g", "daemon off;"]
+#Services deployment
+RUN mkdir logs
+RUN gunicorn --access-logfile logs/access_logfile.log --error-logfile logs/error_logfile.log --capture-output --log-level debug --workers 3 --bind unix:deeprespred.sock -m 007 run:app &
+RUN chmod 666 deeprespred.sock
+RUN chmod +x deeprespred.sock
+WORKDIR /usr/share/nginx/html
+RUN cp /home/nginx-config/default.conf /default.conf
+
+#Algorithm daemon deployment
+WORKDIR /home/back_project/autProcess
+RUN mkdir queueReq && mkdir processingPred && mkdir filesDownloaded && mkdir s3UploadDir
+RUN nohup python deepResPredDaemon.py &
+
+# Startup to be executable nginx
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
