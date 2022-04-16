@@ -1,3 +1,5 @@
+import os
+
 BUCKET_NAME=""
 IP_INFO_TOKEN=""
 
@@ -6,12 +8,13 @@ URL_FRONT_END_DEEPRESPRED="http://frontendDomain/"
 
 EMAIL_TOKEN = ""
 
+
 #BD config
-DB_USER=""
-DB_PASS=""
-DB_ADDR=""
+DB_USER=os.getenv('DB_USER') 
+DB_PASS=os.getenv('DB_PASS') 
+DB_ADDR=os.getenv('DB_ADDR') 
 DB_PORT="3306"              #Mysql port is 3306 by default
-DB_NAME=""
+DB_NAME=os.getenv('DB_NAME') 
 
 #AWS s3 config - True (default) if the back-end env has direct access to aws s3, False to use set variables values in constants_aws.json file
 LOCAL_AWS_FLAG=True

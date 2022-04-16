@@ -166,26 +166,9 @@ WORKDIR /home/algPrograms/DMPfold/bin
 RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithdb
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
 
-#--------------------------------SERVICES CONFIGURATION--------------------------------
-
-#BD-Flask Config
-WORKDIR /home/back_project
-RUN python migrate.py db init
-RUN python migrate.py db migrate
-RUN python migrate.py db upgrade
-
-#Services deployment
-RUN mkdir logs
-RUN gunicorn --access-logfile logs/access_logfile.log --error-logfile logs/error_logfile.log --capture-output --log-level debug --workers 3 --bind unix:deeprespred.sock -m 007 run:app &
-RUN chmod 666 deeprespred.sock
-RUN chmod +x deeprespred.sock
-WORKDIR /usr/share/nginx/html
-RUN cp /home/nginx-config/default.conf /default.conf
-
-#Algorithm daemon deployment
-WORKDIR /home/back_project/autProcess
-RUN mkdir queueReq && mkdir processingPred && mkdir filesDownloaded && mkdir s3UploadDir
-RUN nohup python deepResPredDaemon.py &
-
 # Startup to be executable nginx
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+COPY ./nginx-config/startup.sh /startup.sh
+
+# Startup to be executable
+RUN chmod +x /startup.sh
+ENTRYPOINT ["/startup.sh"]
