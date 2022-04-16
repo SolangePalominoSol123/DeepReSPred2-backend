@@ -1,16 +1,28 @@
 #!/bin/bash
 
+# DeepReSPred
+# Prediction algorithm of tertiaty structure of repeat proteins from diferent input types. This algorithm uses DMPFold algorithm uses as a base and adapt it to the repeat-protein families. 
+# DeepReSPred just need as an input any PFAM code of a repet protein family or any protein sequence in a fasta file to start the prediction.
+
+# DMPFold original script by David T. Jones, June 2018
+# Copyright (C) 2018 University College London
+# License: GPLv3
+
+# DeepReSPred (DMPFold adapted) original script by Solange Palomino, July 2021
+# Copyright (C) 2021 Pontificia Universidad Católica del Perú
+
+
 echo "---------------------------Start------------------------------"
 
 
 # Set this to point to the DMPfold directory
-dmpfolddir=/home/ladmin/algPrograms/DMPfold
-mappingFastaDir=/home/ladmin/DeepReSPred-back/back_project/deepReSPred
+dmpfolddir=/home/algPrograms/DMPfold
+deeprespreddir=/home/back_project/deepReSPred
 
 
 
 if [ "$#" -lt 1 ]; then
-    echo "Usage: run_dmpfold.sh (PFAMCODE|filename.fasta) [outputDir]"
+    echo "Usage: run_repeat_prediction.sh (PFAMCODE|filename.fasta) [outputDir]"
     exit 1
 fi
 
@@ -28,15 +40,15 @@ dirFlags=$dirAux/flagsEnding
 echo "Results directory: " $dirAux
 echo ""
 
-#COMENZAMOS A MEDIR EL TIEMPO
+#START TIMER
 inicio_ns_General=`date +%s%N`
 inicio_General=`date +%s`
 echo "Started in (ns):" $inicio_ns_General
 
-#Generar todos los archivos segun las modificaciones planteadas
-#Todos los archivos se generarán dentro de $dirAux/target p.j. python3 MappingFasta.py default target4/
-python3 $mappingFastaDir/MappingFasta.py $pfamCode $dirAux
-#python3 MappingFasta.py default $dirAux #thiss-----------------
+#Generate all files according to defined modifications
+#All files will be generated in $dirAux/target directory p.j. python3 MappingFasta.py default target4/
+python3 $deeprespreddir/MappingFasta.py $pfamCode $dirAux
+#python3 MappingFasta.py default $dirAux 
 
 echo ""
 echo "---------------GENERATING INTERMEDIATE FILES---------------"
@@ -44,7 +56,7 @@ echo ""
 
 counter=0
 
-#recorremos los archivos ***.fasta para generar archivos intermedios .map y .21c
+#Use all files ***.fasta to generate middle files .map y .21c
 
 for file in $dirAux/target/*.fasta; do 
         mkdir -p $dirAux/results/test_seq$counter
@@ -72,7 +84,7 @@ for directory in $dirAux/results/test*; do
 	rm $directory/*.temp.fasta
     find . -type f -not \( -name '*map' -or -name '*fasta' -or -name '*.21c' -or -name 'final_*' \) -delete
     echo $directory/*.fasta
-    sh $dmpfolddir/run_dmpfold.sh $directory/*.fasta $directory/*.21c $directory/*.map $directory/output $dirFlags
+    sh $deeprespreddir/run_dmpfold.sh $directory/*.fasta $directory/*.21c $directory/*.map $directory/output $dirFlags
 
     nTests=$((nTests+1)) 
 done
@@ -83,7 +95,7 @@ echo ""
 echo "-------------------End------------------"
 echo "N° Tests:" $nTests
 
-#TERMINAMOS DE MEDIR EL TIEMPO
+#END TIMER
 fin_ns_General=`date +%s%N`
 fin_General=`date +%s`
 echo "End of general predictions in (ns):" $fin_ns_General

@@ -1,23 +1,22 @@
 #!/bin/bash
 
 # DMPfold
-# Iteratively generate models using CNS and deep neural nets to
-#  generate updated constraints
-# Arguments are FASTA file, 21c file, map file, out directory,
-#  number of cycles (optional) and models per cycle (optional)
+# Iteratively generate models using CNS and deep neural nets to generate updated constraints
+# Arguments are FASTA file, 21c file, map file, out directory, number of cycles (optional) and models per cycle (optional)
 
 # Original script by David T. Jones, June 2018
-
 # Copyright (C) 2018 University College London
-
 # License: GPLv3
 
+# DeepReSPred (DMPFold adapted) original script by Solange Palomino, July 2021
+# Copyright (C) 2021 Pontificia Universidad Católica del Perú
+
 # Set this to point to the DMPfold directory
-dmpfolddir=/home/ladmin/algPrograms/DMPfold
+dmpfolddir=/home/algPrograms/DMPfold
 
 # Set this to point to the CNS setup script
 STOREPATH=$PATH
-. /home/ladmin/algPrograms/cns_solve_1.3/cns_solve_env.sh
+. /home/algPrograms/cns_solve_1.3/cns_solve_env.sh
 export PATH="$STOREPATH:$PATH" # CNS setup can remove some things from the path
 
 bindir=$dmpfolddir/bin
@@ -66,7 +65,7 @@ fi
 if [ -e $outdir ]; then
     echo "Directory $outdir already exists."
 #    exit 1
-else #esto no estaba
+else #added
     echo "Creating directory $outdir."
     mkdir $outdir
 fi
@@ -74,7 +73,7 @@ fi
 if [ -e $endFlagdir ]; then
     echo "Directory $endFlagdir already exists."
 #    exit 1
-else #esto no estaba
+else #added
     echo "Creating directory $endFlagdir."
     mkdir $endFlagdir
 fi
@@ -84,7 +83,7 @@ fi
 cd $outdir
 #rm * #esto no estaba
 
-#COMENZAMOS A MEDIR EL TIEMPO
+#STAR TIMER
 inicio_ns=`date +%s%N`
 inicio=`date +%s`
 
@@ -144,7 +143,7 @@ ln -s $bindir/qmodope_mainens .
 counter=1
 until [ $counter -gt $ncycles ]; do
 	echo "iteracion " $counter " de " $ncycles
-    if [ $counter -gt 1 ]; then #no se ejecuta esto en la primera iteracion
+    if [ $counter -gt 1 ]; then #not executable in first iteration
         \mv contacts.current contacts.$((counter - 1))
         \mv rawdistpred.current rawdistpred.$((counter - 1))
         \mv hbcontacts.current hbcontacts.$((counter - 1))
@@ -169,8 +168,8 @@ until [ $counter -gt $ncycles ]; do
             exit 1
         fi
     fi
-	#esto se ejecuta para todas las iteraciones
-    if [ ! -s dihedral.tbl ]; then #verfica si esta vacio
+	#executable in every iteration
+    if [ ! -s dihedral.tbl ]; then #verify if it is empty
         echo "No valid torsion angles."
         find . -type f -not \( -name '*map' -or -name '*fasta' -or -name '*.21c' -or -name 'final_*' \) -delete
         echo "No valid torsion angles." > $endFlagdir/err_$target.txt
@@ -197,7 +196,7 @@ until [ $counter -gt $ncycles ]; do
 
     \rm -f $target*.pdb*
 
-	RANDOM=$$ #le agregue esto
+	RANDOM=$$ #added
     seed=$RANDOM
     echo "seed = " $seed
     sed "s/_TARGET_NAME_/$target/" $cnsdir/dgsa.inp | sed "s/_SEED_/$seed/" | sed "s/_NMODELS_/$nmodels/g" > dgsa.inp 
@@ -240,7 +239,7 @@ until [ $counter -gt $ncycles ]; do
         ./qmodope_mainens ensemble.$counter.pdb
     fi
 
-	counter=$((counter+1))
+	counter=$((counter+1)) #changed
 done
 
 cat ensemble.*.pdb > ensemble.pdb
@@ -281,7 +280,7 @@ lenSeq=$((lenSeq-1))
 echo "Sequence with longitude: "$lenSeq
 echo ""
 echo "end of this prediction"
-#TERMINAMOS DE MEDIR EL TIEMPO
+#END TIMER
 fin_ns=`date +%s%N`
 fin=`date +%s`
 total_ns=$(($fin_ns-$inicio_ns))

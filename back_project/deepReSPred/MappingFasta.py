@@ -154,7 +154,6 @@ print("Generating Fasta files: completed sequences and only fragments...........
 #Generamos el FASTA desde Pfam
 if flagPFcode:
     try:
-        #urlFasta='https://pfam.xfam.org/family/alignment/download/format?acc='+pfam+'&alnType=full&format=fasta&order=t&case=l&gaps=default&download=1'
         urlFasta='https://pfam.xfam.org/family/alignment/download/format?acc='+pfam+'&alnType=seed&format=fasta&order=t&case=l&gaps=default&download=1'
         print(urlFasta)
         ssl._create_default_https_context = ssl._create_unverified_context

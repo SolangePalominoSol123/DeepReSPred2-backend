@@ -111,9 +111,8 @@ while True:
 
             #start prediction
             clearDir(ALGORITHM_PROCESSING)
-            algorithmPath=os.path.join(ALGORITHM_FOLDER, secure_filename("run_repeat_prediction.sh")) ########real
-            #algorithmPath=os.path.join(ALGORITHM_FOLDER, secure_filename("pruebaShell.sh"))
-
+            algorithmPath=os.path.join(ALGORITHM_FOLDER, secure_filename("run_repeat_prediction.sh"))
+            
             if(typeInput=="pfamCode"):
                 exit_code = subprocess.call(["sh",algorithmPath,pfamID,ALGORITHM_PROCESSING])
                 print(exit_code)
