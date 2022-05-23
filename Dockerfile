@@ -8,6 +8,9 @@ WORKDIR /home
 # Copy all files from current directory to working dir in image
 COPY . .
 
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/London
+
 #apt get install
 RUN apt-get update && yes | apt-get upgrade
 RUN apt install -y git
@@ -24,7 +27,9 @@ RUN apt install python3.7 -y
 RUN update-alternatives --install /usr/bin/python3 python /usr/bin/python3.8 1
 RUN update-alternatives --install /usr/bin/python3 python /usr/bin/python3.7 2
 RUN ln -sv /usr/bin/python3.7 python
-#---python --version
+RUN apt-get install -y python3.7-distutils
+RUN alias python=python3.7
+#---python --version    
 
 #MySQL Dependencies
 RUN apt install -y mysql-client-core-8.0
@@ -32,8 +37,6 @@ RUN apt-get install -y libmysqlclient-dev
 RUN apt install -y libpython3.7-dev
 
 #Cmake
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/London
 RUN apt-get install -y cmake
 
 RUN mkdir data && mkdir algPrograms
@@ -126,14 +129,20 @@ RUN ./installscripts.sh
 
 #DeepReSPred pip Dependencies
 WORKDIR /home/back_project
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt 
+#RUN python3.7 -m pip install -r requirements.txt #si se comenta la linea 31
 
 #Mapping Fasta file 
 WORKDIR /home/back_project/deepReSPred
-RUN echo "Choose PFAM Download type with PFAMTYPE ARG: seed (default) or full"
-ARG PFAMTYPE=full
-RUN echo "Valor PFAMTYPE=${PFAMTYPE}"
-RUN sed -i "s/alnType=seed/alnType=${PFAMTYPE}/" MappingFasta.py
+RUN echo "Defining PFAM Download type with PFAM_MODE ARG: seed (default) or full"
+ARG PFAM_MODE=seed
+RUN echo "Valor PFAM_MODE=${PFAM_MODE}"
+#RUN echo "Choose PFAM Download type with PFAMTYPE ARG: seed (default) or full"
+#ARG PFAMTYPE=full
+#RUN echo "Valor PFAMTYPE=${PFAMTYPE}"
+#RUN sed -i "s/alnType=seed/alnType=${PFAMTYPE}/" MappingFasta.py
+
+ARG LOCAL_AWS_FLAG=True
 
 #DMPfold files
 ARG NCPU=4
@@ -167,8 +176,9 @@ RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithd
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
 
 # Startup to be executable nginx
-COPY ./nginx-config/startup.sh /startup.sh
+#COPY ./nginx-config/startup.sh ./startup.sh
+WORKDIR /home/nginx-config
 
 # Startup to be executable
-RUN chmod +x /startup.sh
-ENTRYPOINT ["/startup.sh"]
+RUN chmod +x startup.sh
+ENTRYPOINT ["./startup.sh"]

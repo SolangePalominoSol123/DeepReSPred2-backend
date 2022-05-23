@@ -8,6 +8,7 @@ import sys
 import re
 import ssl
 
+PFAM_MODE=os.getenv('PFAM_MODE') 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -154,7 +155,7 @@ print("Generating Fasta files: completed sequences and only fragments...........
 #Generamos el FASTA desde Pfam
 if flagPFcode:
     try:
-        urlFasta='https://pfam.xfam.org/family/alignment/download/format?acc='+pfam+'&alnType=seed&format=fasta&order=t&case=l&gaps=default&download=1'
+        urlFasta='https://pfam.xfam.org/family/alignment/download/format?acc='+pfam+'&alnType='+PFAM_MODE+'&format=fasta&order=t&case=l&gaps=default&download=1'
         print(urlFasta)
         ssl._create_default_https_context = ssl._create_unverified_context
         filename = wget.download(urlFasta, out=ALGORITHM_PROCESSING)

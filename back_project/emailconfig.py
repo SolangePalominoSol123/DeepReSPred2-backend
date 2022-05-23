@@ -1,5 +1,6 @@
 from constants import URL_FRONT_END_DEEPRESPRED
 from constants import EMAIL_TOKEN
+from constants import EMAIL_SENDER
 from emailTemplates.TemplateNoResults import getTemplateNoResults
 from emailTemplates.TemplateReceivedRequest import getTemplateReceivedRequest
 from emailTemplates.TemplateResults import getTemplateResults
@@ -17,7 +18,7 @@ import os
 def sendEmail (receiver, files, type, idRequest, inputType, inputContent):
 
     # User configuration   
-    sender_email = "deeprespred@gmail.com"
+    sender_email = EMAIL_SENDER
     sender_name = "DeepReSPred"
     password = EMAIL_TOKEN
 

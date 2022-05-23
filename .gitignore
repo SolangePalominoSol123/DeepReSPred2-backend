@@ -7,6 +7,12 @@ __pycache__/
 # C extensions
 *.so
 
+#DeepResPred Credentials Information
+commands.txt
+envDocker.list
+auxiliarPrograms/constants.py
+auxiliarPrograms/cns_solve_1.3_all_intel-mac_linux.tar.gz
+
 # Distribution / packaging
 .Python
 build/

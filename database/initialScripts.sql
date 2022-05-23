@@ -1,16 +1,16 @@
 USE deeprespredDB;
 
---Parameter Table
+#----Parameter Table
 
-INSERT INTO deeprespredDB.parameter (idParameter, name, description, value) VALUES (1, 'maxRequestsxDay', 'Maximum quantity of requests by user per day', 30);
-INSERT INTO deeprespredDB.parameter (idParameter, name, description, value) VALUES (2, 'maxResidues', 'Maximum quantity of residues in a sequence', 515);
-INSERT INTO deeprespredDB.parameter (idParameter, name, description, value) VALUES (3, 'cpuNumber', 'Quantity of server cpus assigned to prediction process', 4);
+INSERT INTO deeprespredDB.parameter (name, description, value) VALUES ('maxRequestsxDay', 'Maximum quantity of requests by user per day', 30);
+INSERT INTO deeprespredDB.parameter (name, description, value) VALUES ('maxResidues', 'Maximum quantity of residues in a sequence', 515);
+INSERT INTO deeprespredDB.parameter (name, description, value) VALUES ('cpuNumber', 'Quantity of server cpus assigned to prediction process', 4);
 
---StatusRequest Table
-
-INSERT INTO deeprespredDB.statusrequest (idStatus, name) VALUES (1, 'REGISTERED');
-INSERT INTO deeprespredDB.statusrequest (idStatus, name) VALUES (3, 'PROCESSING');
-INSERT INTO deeprespredDB.statusrequest (idStatus, name) VALUES (4, 'FINALIZED');
-INSERT INTO deeprespredDB.statusrequest (idStatus, name) VALUES (5, 'ERROR');
+#----StatusRequest Table
+INSERT INTO deeprespredDB.statusrequest (name) VALUES ('REGISTERED');
+INSERT INTO deeprespredDB.statusrequest (name) VALUES ('IN PROCESS');
+INSERT INTO deeprespredDB.statusrequest (name) VALUES ('PROCESSING');
+INSERT INTO deeprespredDB.statusrequest (name) VALUES ('FINALIZED');
+INSERT INTO deeprespredDB.statusrequest (name) VALUES ('ERROR');
 
 COMMIT;
