@@ -40,8 +40,7 @@ fi
 #Services deployment
 mkdir /home/back_project/logs
 cd  /home/back_project && gunicorn --access-logfile /home/back_project/logs/access_logfile.log --error-logfile /home/back_project/logs/error_logfile.log --capture-output --log-level debug --workers 3 --bind unix:deeprespred.sock -m 007 run:app &
-chmod 666 /home/back_project/deeprespred.sock
-chmod +x /home/back_project/deeprespred.sock
+cd  /home/back_project && chmod 777 deeprespred.sock
 
 # Remove default nginx static assets
 cd /usr/share/nginx/html && rm -rf ./*
