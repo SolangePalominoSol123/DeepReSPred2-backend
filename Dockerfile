@@ -89,6 +89,9 @@ RUN conda install -y -c bioconda blast-legacy
 #TM-align
 RUN apt-get install -y tm-align
 
+#cron
+RUN apt-get install -y cron
+
 #CNS
 RUN apt-get install -y flex
 RUN apt-get install -y csh
@@ -179,7 +182,7 @@ WORKDIR /home/algPrograms/DMPfold/bin
 RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithdb
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
 
-#-----------------LOOGER TO NOHUP DEAMON
+#-----------------LOOGER
 RUN echo '/home/back_project/autProcess/nohup.out /home/back_project/autProcess/logs_daemon/deepReSPred.log {'>> /etc/logrotate.conf
 RUN echo 'size 5M'>> /etc/logrotate.conf
 RUN echo 'copytruncate'>> /etc/logrotate.conf
@@ -187,6 +190,8 @@ RUN echo 'rotate 100'>> /etc/logrotate.conf
 RUN echo 'maxage 100'>> /etc/logrotate.conf
 RUN echo '}'>> /etc/logrotate.conf
 #logrotation hourly
+COPY ./crontab /etc
+RUN chmod +x /etc/crontab
 COPY ./logrotate /etc/cron.hourly
 WORKDIR /etc/cron.hourly
 RUN chmod +x logrotate
