@@ -15,12 +15,13 @@ sys.path.append(parent)
 from constants import FILES_DOWNLOADED
 from constants import URL_BACK_END_DEEPRESPRED
 from emailconfig import sendEmail
+from base_logger import logger
 
 def clearDir(directory):
     try:
         shutil.rmtree(directory)
     except OSError as e:
-        print("Error: %s: %s" % (directory, e.strerror))
+        logger.error("%s: %s" % (directory, e.strerror))
 
 def createDir(directory):
     isdir = os.path.isdir(directory) 
@@ -28,8 +29,8 @@ def createDir(directory):
         clearDir(directory)
     try:
         os.makedirs(directory)
-    except:
-        print("Error with directory: "+directory)
+    except Exception as e:
+        logger.error("%s: %s" % (directory, e.strerror))
         return False
     
     return True
@@ -41,7 +42,7 @@ def convertSto2Fasta(dirFile):
         nameFastaFull=nameOnly+".fasta"
         records = SeqIO.parse(dirFile, "stockholm")
         count = SeqIO.write(records, nameFastaFull, "fasta")
-        print("Converted %i records" % count)
+        logger.info("Converted %i records" % count)
     return nameFastaFull
 
 def downloadFilesToLocal(filename, extension):
@@ -54,9 +55,10 @@ def downloadFilesToLocal(filename, extension):
     response = requests.get(URL_BACK_END_DEEPRESPRED+"s3file/", params=dataInput)
     rsp=response.json()
     if not rsp["error"]:
-        print("File downloaded: "+rsp["fullNamePath"])
+        logger.info("File downloaded: "+rsp["fullNamePath"])
         return rsp["fullNamePath"]
     else:
+        logger.error("File not downloaded: "+filename)
         return ""
 
 
@@ -73,7 +75,6 @@ def validateAndAssignResults(idRequest,pfamID,email, inputType):
     if existsPFAMresults:
         #send email with results of prediction
         if(email!=""):
-            #sendEmailWithResults2(idRequest, email, inputType, pfamID) #---update 08-03-2022
             dataInput={
                 "email" : email,
                 "idRequest" : idRequest,
@@ -93,4 +94,4 @@ def verifyDirOrCreate(directory):
         try:
             os.makedirs(directory)
         except:
-            print("Error verifying or creating directory: "+directory)
+            logger.error("Error verifying or creating directory: "+directory)

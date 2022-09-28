@@ -15,28 +15,29 @@ sys.path.append(parent)
 
 from constants import URL_BACK_END_DEEPRESPRED
 from constants import S3_UPLOAD_DIR
+from base_logger import logger
 
 def processingResults(dirPDBAux, dirResults, idRequest):
     PDBAux_list = os.listdir(dirPDBAux)
 
     flagPDBAux=False
     if len(PDBAux_list)>0:
-        print("There is a PDB aux to evaluate predicted fragments...")
+        logger.info("There is a PDB aux to evaluate predicted fragments...")
         PDBAux_file=PDBAux_list[0]
         PDBAux_fileFull=os.path.join(dirPDBAux, secure_filename(PDBAux_file))
-        print(PDBAux_fileFull)
+        logger.info(PDBAux_fileFull)
         flagPDBAux=True
     else:
-        print("There is not any PDB aux to evaluate predicted fragments...")
+        logger.info("There is not any PDB aux to evaluate predicted fragments...")
         
 
     group=1
     dirResults_list = os.listdir(dirResults)
     for dirResult in dirResults_list:
         dirResult_full=os.path.join(dirResults, secure_filename(dirResult)) #dir ../results/test_seq*/
-        print("\n------------------------------------------------------")
-        print("Current dir: "+dirResult_full)
-        print("Subgroup: "+str(group))
+        logger.info("\n------------------------------------------------------")
+        logger.info("Current dir: "+dirResult_full)
+        logger.info("Subgroup: "+str(group))
 
         #Final
         fileFullInput=""
@@ -57,18 +58,18 @@ def processingResults(dirPDBAux, dirResults, idRequest):
         maxGen=0
         #Is a fragment, not a complete sequence
         if len(listFilesInputIS)>0: 
-            print("\nEvaluating a fragment...")
+            logger.info("\nEvaluating a fragment...")
             listFilesResults=fnmatch.filter(os.listdir(dirFilesResult), 'final_*.pdb')
 
             if flagPDBAux:
                 maxGen=0
                 fileResultFullGen=""
                 for fileResult in listFilesResults:
-                    print("Evaluating TM-align between:")
+                    logger.info("Evaluating TM-align between:")
                     #TMalign
                     fileResultFull=os.path.join(dirFilesResult, secure_filename(fileResult)) #.PDB generated                    
-                    print(fileResultFull)
-                    print(PDBAux_fileFull)
+                    logger.info(fileResultFull)
+                    logger.info(PDBAux_fileFull)
 
                     proc = subprocess.Popen(['TMalign', PDBAux_fileFull, fileResultFull], stdout=subprocess.PIPE)
                     output = str(proc.stdout.read())
@@ -77,12 +78,12 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                     for m in re.finditer('TM-score= ', output):
                         posValue=m.end()
                         value=float(output[posValue:posValue+7])
-                        print("TM-score: "+str(value))
+                        logger.info("TM-score: "+str(value))
                         #value=0.6 ######################################################################
                         if value>maxTM:
                             maxTM=value
 
-                    print("TM-score_aux: "+str(maxTM))
+                    logger.info("TM-score_aux: "+str(maxTM))
 
                     if maxTM>maxGen:
                         maxGen=maxTM
@@ -91,24 +92,24 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
                 if maxGen>0.5:
                     #aprobado fileResultFullGen .pdb
-                    print("Fragment aproved...")
+                    logger.info("Fragment aproved...")
                     fullFragmentInput=os.path.join(dirResult_full, secure_filename(listFilesInputIS[0])) #.fasta
                     fileFullInput=fullFragmentInput
                     fileFullPDB=fileResultFullGen
-                    print(fullFragmentInput)
-                    print(fileResultFullGen)
+                    logger.info(fullFragmentInput)
+                    logger.info(fileResultFullGen)
                     isFragmentFlag=True
 
                     fullPathAlign1=os.path.join(dirResult_full, secure_filename("TM.sup"))
                     fullPathAlign2=os.path.join(dirResult_full, secure_filename("TM.sup_atm"))
                     proc = subprocess.Popen(['TMalign', fileFullPDB, PDBAux_fileFull, "-o", fullPathAlign1])
                     fileFullAlign=fullPathAlign2
-                    print("TM-align file generated: "+fileFullAlign)
+                    logger.info("TM-align file generated: "+fileFullAlign)
                     
             else:
                 #no hay PDB aux
                 if(len(listFilesResults)>0):
-                    print("There is not PDB aux to evaluate TM-score. Selecting the first: final_1.pdb")
+                    logger.info("There is not PDB aux to evaluate TM-score. Selecting the first: final_1.pdb")
                     #fileResultFull=os.path.join(dirFilesResult, secure_filename(listFilesResults[0])) #.PDB generated  
                     fileResultFull=os.path.join(dirFilesResult, secure_filename("final_1.pdb")) #.PDB generated  
                     fullFragmentInput=os.path.join(dirResult_full, secure_filename(listFilesInputIS[0])) #.fasta
@@ -116,26 +117,26 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                     fileFullInput=fullFragmentInput
                     fileFullPDB=fileResultFull
                 else:
-                    print("There is not PDB aux to evaluate TM-score, nor any predicted structure PDB")
+                    logger.info("There is not PDB aux to evaluate TM-score, nor any predicted structure PDB")
 
 
         #Is a complete sequence
         if len(listFilesInputNR)>0: 
-            print("\nEvaluating a complete sequence...")
+            logger.info("\nEvaluating a complete sequence...")
             listFilesResults=fnmatch.filter(os.listdir(dirFilesResult), 'final_1.pdb')
 
             if len(listFilesResults)>0:
                 fileResultFull=os.path.join(dirFilesResult, secure_filename(listFilesResults[0])) #.PDB generated
                 fullFragmentInput=os.path.join(dirResult_full, secure_filename(listFilesInputNR[0])) #.fasta
                 
-                print("NR - Complete sequence:")
-                print(fileResultFull)
-                print(fullFragmentInput)
+                logger.info("NR - Complete sequence:")
+                logger.info(fileResultFull)
+                logger.info(fullFragmentInput)
                 fileFullInput=fullFragmentInput
                 fileFullPDB=fileResultFull
                 isFragmentFlag=False
             else:
-                print("Any predicted structure PDB was finded")
+                logger.info("Any predicted structure PDB was finded")
                 
 
 
@@ -143,18 +144,18 @@ def processingResults(dirPDBAux, dirResults, idRequest):
         fileFullmap=os.path.join(dirResult_full, secure_filename(listFilesMap[0])) #.map
 
         if(fileFullInput!="" and fileFullPDB!="" and fileFull21c!="" and fileFullmap!=""):
-            print("----------")
-            print("Good prediction")
-            print(fileFullInput)
-            print(fileFullPDB)
-            print(fileFull21c)
-            print(fileFullmap)
-            print("Is Fragment: "+str(isFragmentFlag))
-            print("Subgroup: " + str(group))
-            print("ID Request: "+str(idRequest))
-            print("----------")
+            logger.info("----------")
+            logger.info("Good prediction")
+            logger.info(fileFullInput)
+            logger.info(fileFullPDB)
+            logger.info(fileFull21c)
+            logger.info(fileFullmap)
+            logger.info("Is Fragment: "+str(isFragmentFlag))
+            logger.info("Subgroup: " + str(group))
+            logger.info("ID Request: "+str(idRequest))
+            logger.info("----------")
 
-            print("\nSaving data to DB and S3 bucket...")
+            logger.info("\nSaving data to DB and S3 bucket...")
             #Fasta
             posDot=fileFullInput.find(".")
             dataInput={
@@ -168,7 +169,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 "isResult" : False
             }
             response = requests.post(URL_BACK_END_DEEPRESPRED+"filexreqInfo/", json=dataInput)
-            print(response)
+            logger.info(response)
             rsp=response.json()
             registeredFasta=rsp["nameFile"]
 
@@ -184,7 +185,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 }
                 response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
             except Exception as e:
-                print("Error in resultsManager line 187: "+str(e))
+                logger.error("Error in resultsManager line 187: "+str(e))
 
             #---------------
 
@@ -201,7 +202,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 "isResult" : True
             }
             response = requests.post(URL_BACK_END_DEEPRESPRED+"filexreqInfo/", json=dataInput)
-            print(response)
+            logger.info(response)
             rsp=response.json()
             registeredPDB=rsp["nameFile"]
 
@@ -217,7 +218,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 }
                 response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
             except Exception as e:
-                print("Error in resultsManager line 220: "+str(e))
+                logger.error("Error in resultsManager line 220: "+str(e))
 
             #-------------------------------
 
@@ -234,7 +235,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 "isResult" : False
             }
             response = requests.post(URL_BACK_END_DEEPRESPRED+"filexreqInfo/", json=dataInput)
-            print(response)
+            logger.info(response)
             rsp=response.json()
             registered21c=rsp["nameFile"]
 
@@ -250,7 +251,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 }
                 response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
             except Exception as e:
-                print("Error in resultsManager line 253: "+str(e))
+                logger.error("Error in resultsManager line 253: "+str(e))
 
             #--------------
 
@@ -267,7 +268,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 "isResult" : False
             }
             response = requests.post(URL_BACK_END_DEEPRESPRED+"filexreqInfo/", json=dataInput)
-            print(response)
+            logger.info(response)
             rsp=response.json()
             registeredMap=rsp["nameFile"]
 
@@ -283,7 +284,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                 }
                 response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
             except Exception as e:
-                print("Error in resultsManager line 286: "+str(e))
+                logger.error("Error in resultsManager line 286: "+str(e))
 
             #---------------
 
@@ -301,7 +302,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                     "isResult" : True
                 }
                 response = requests.post(URL_BACK_END_DEEPRESPRED+"filexreqInfo/", json=dataInput)
-                print(response)
+                logger.info(response)
                 rsp=response.json()
                 registeredAlign=rsp["nameFile"]
 
@@ -317,7 +318,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
                     }
                     response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
                 except Exception as e:
-                    print("Error in resultsManager line 320: "+str(e))
+                    logger.error("Error in resultsManager line 320: "+str(e))
             
 
 
@@ -328,23 +329,3 @@ def processingResults(dirPDBAux, dirResults, idRequest):
     createDir(dirPDBAux)
     createDir(dirResults)
     createDir(S3_UPLOAD_DIR)
-
-
-"""
-dirpath="/home/spalomino/DeepReSPred-back/back_project/autProcess/processingPred/target"
-dirpath2="/home/spalomino/DeepReSPred-back/back_project/autProcess/processingPred/results"
-dirpath3="/home/spalomino/DeepReSPred-back/back_project/autProcess/processingPred/auxFiles"
-dirpath4="/home/spalomino/DeepReSPred-back/back_project/autProcess/processingPred/flagsEnding"
-
-canti=len(fnmatch.filter(os.listdir(dirpath), '*.fasta')) #cantidad de inputs
-canti2=len(fnmatch.filter(os.listdir(dirpath2), 'test_*')) #cantidad de archivos intermedios generados
-canti3=len(fnmatch.filter(os.listdir(dirpath3), '*pdb')) #cantidad de archivos intermedios generados
-canti4=len(fnmatch.filter(os.listdir(dirpath4), '*_txt')) #cantidad de flags (procesos terminados)
-
-print(canti)
-print(canti2)
-print(canti3)
-print(canti4)
-
-processingResults(dirpath3, dirpath2,"AAAAAAA")
-"""

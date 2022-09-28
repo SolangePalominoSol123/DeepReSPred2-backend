@@ -42,29 +42,10 @@ from constants import UPLOAD_FOLDER
 
 
 ##---------------------------------------LOGGER-----------------
-
-import logging
-from logging.handlers import RotatingFileHandler
-logging.basicConfig(
-  handlers=[
-    RotatingFileHandler(
-      '/home/back_project/autProcess/logs_daemon/deepReSPred.log',
-      maxBytes=10240000,
-      backupCount=5
-    )
-  ],
-  level=logging.INFO,
-  format='%(levelname)s - %(asctime)s ::: f. %(funcName)s - line %(lineno)s ::: %(message)s'
-)
-
-logging.info('Admin logged out')
-logging.warning('Admin logged out')
-logging.error('Admin logged out')
-
+from base_logger import logger
 ##--------------------------------------------------------------
 
 q = deque()
-
 
 while True:
 
@@ -72,21 +53,12 @@ while True:
     newReqs_list = os.listdir(DAEMON_QUEUE_FOLDER)
     if len(newReqs_list)>0:
         idRequest=newReqs_list[0]
-        print(idRequest)
+        logger.info(idRequest)
         if q.count(idRequest)<=0:
             q.append(idRequest)
-            print("Daemon queue status:")
-            print(q)
-            
-        """
-        nameFileFull=os.path.join(DAEMON_QUEUE_FOLDER, secure_filename(idRequest))
+            logger.info("Daemon queue status:")
+            logger.info(q)
 
-        if os.path.exists(nameFileFull):
-            os.remove(nameFileFull)
-            print("File of prediction idRequest removed")
-        else:
-            print("The file does not exist")
-        """
 
     #If algorithm is free, unqueue a request (if any)  and process
     if freeAlgorithm and len(q)>0:
@@ -96,7 +68,7 @@ while True:
         actualIdRequest=idRequest
 
         timeIni = time.time()
-        print("Starting a prediction request ID: "+str(actualIdRequest))
+        logger.info("Starting a prediction request ID: "+str(actualIdRequest))
 
         #bring data from DB
         dataInput={
@@ -110,7 +82,7 @@ while True:
         actualIdRequest=rsp["idRequest"]
         email=rsp["email"]
         pfamID=rsp["pfamID"]
-        print(rsp)
+        logger.info(rsp)
         
 
         #update status request in DB : Processing
@@ -120,29 +92,29 @@ while True:
         }
         response = requests.put(URL_BACK_END_DEEPRESPRED+"request/", json=dataInput)
         rsp=response.json()
-        print(rsp)
+        logger.info(rsp)
         
         already=False
         #verify if pfamID is not null and if pfamId has a already calculated results
         if ((pfamID is not None) or (typeInput=="pfamCode")):
             already=validateAndAssignResults(actualIdRequest,pfamID,email, typeInput)
-            print("Already calculated?")
-            print(already)
+            logger.info("Already calculated?")
+            logger.info(already)
             
 
         if not already:
 
             #start prediction
-            clearDir(ALGORITHM_PROCESSING)
+            createDir(ALGORITHM_PROCESSING)
             algorithmPath=os.path.join(ALGORITHM_FOLDER, secure_filename("run_repeat_prediction.sh"))
             
             if(typeInput=="pfamCode"):
                 exit_code = subprocess.call(["sh",algorithmPath,pfamID,ALGORITHM_PROCESSING])
-                print(exit_code)
-                print("IS A PFAM CODE PREDICTION")
+                logger.info(exit_code)
+                logger.info("IS A PFAM CODE PREDICTION")
             else: # seqSto, seqFasta, seqOnly
 
-                print("IS NOT A PFAM CODE PREDICTION")
+                logger.info("IS NOT A PFAM CODE PREDICTION")
                 #Download files
                 createDir(UPLOAD_FOLDER)
                 #Files are in filesInFolder Folder
@@ -157,17 +129,17 @@ while True:
 
                     destinationDir=ALGORITHM_PROCESSING+"/target"
                     if createDir(destinationDir):                                   #Here is where files must be
-                        print("moving file")
+                        logger.info("moving file")
                         shutil.move(nameFileFullPathInput, destinationDir)
 
                         if(typeInput=="seqOnly"):
-                            print("copying .txt file to .fasta")
+                            logger.info("copying .txt file to .fasta")
                             fileTxt=os.path.join(destinationDir, secure_filename(nameFileInput))  #Here is where files are
                             posDot=nameFileInput.find(".")
-                            print(nameFileInput)
-                            print(posDot)
+                            logger.info(nameFileInput)
+                            logger.info(posDot)
                             newNameFileInput=nameFileInput[:posDot]+".fasta"
-                            print("new namefile: "+ newNameFileInput)
+                            logger.info("new namefile: "+ newNameFileInput)
                             fileFasta=os.path.join(destinationDir, secure_filename(newNameFileInput))
                             shutil.copy(fileTxt, fileFasta)
                             nameFileFullPathInput=fileFasta
@@ -177,11 +149,11 @@ while True:
                         #convert to fasta
                         nameFileFullPathInput=os.path.join(destinationDir, secure_filename(nameFileInput))
 
-                        print("Converting to Fasta from SeqSto")
+                        logger.info("Converting to Fasta from SeqSto")
                         nameFileFullPathInput=convertSto2Fasta(nameFileFullPathInput)
                     
                     exit_code = subprocess.call(["sh",algorithmPath,nameFileFullPathInput,ALGORITHM_PROCESSING])
-                    print(exit_code)
+                    logger.info(exit_code)
             
 
         else:
@@ -189,10 +161,10 @@ while True:
             nameFileFull=os.path.join(DAEMON_QUEUE_FOLDER, secure_filename(actualIdRequest))
             if os.path.exists(nameFileFull):
                 os.remove(nameFileFull)
-                print("File queue of prediction idRequest removed. The prediction process has finished.")
-                print(actualIdRequest)
+                logger.info("File queue of prediction idRequest removed. The prediction process has finished.")
+                logger.info(actualIdRequest)
             else:
-                print("The file queue of prediction idRequest to remove does not exist.")
+                logger.info("The file queue of prediction idRequest to remove does not exist.")
 
             freeAlgorithm=True
         #sys.exit()
@@ -200,16 +172,16 @@ while True:
 
     if not freeAlgorithm:
         #verify status of algorithm, if the prediction has finished (counting files)
-        print("In a prediction process")
+        logger.info("In a prediction process")
         dirFasta=os.path.join(ALGORITHM_PROCESSING, secure_filename("target"))
         dirFlags=os.path.join(ALGORITHM_PROCESSING, secure_filename("flagsEnding"))
         dirPDBAux=os.path.join(ALGORITHM_PROCESSING, secure_filename("auxFiles"))
         dirResults=os.path.join(ALGORITHM_PROCESSING, secure_filename("results"))
 
-        print(dirFasta)
-        print(dirFlags)
-        print(dirPDBAux)
-        print(dirResults)
+        logger.info(dirFasta)
+        logger.info(dirFlags)
+        logger.info(dirPDBAux)
+        logger.info(dirResults)
 
         verifyDirOrCreate(dirFasta)
         verifyDirOrCreate(dirResults)
@@ -238,10 +210,10 @@ while True:
             response = requests.put(URL_BACK_END_DEEPRESPRED+"request/", json=dataInput)
             rsp=response.json()
 
-            print("Making TMalignments...")
+            logger.info("Making TMalignments...")
             processingResults(dirPDBAux, dirResults,actualIdRequest)
 
-            print("Sending email with results")
+            logger.info("Sending email with results")
             #bring data from DB
             dataInput={
                 "idRequest":actualIdRequest
@@ -254,10 +226,9 @@ while True:
             actualIdRequest=rsp["idRequest"]
             email=rsp["email"]
             pfamID=rsp["pfamID"]
-            print(rsp)
+            logger.info(rsp)
 
             if (email!=""):
-                #sendEmailWithResults2(actualIdRequest, email, typeInput, pfamID)   #update 08-03-2022
                 dataInput={
                     "email" : email,
                     "idRequest" : idRequest,
@@ -273,10 +244,9 @@ while True:
 
             if os.path.exists(nameFileFull):
                 os.remove(nameFileFull)
-                print("File queue of prediction idRequest removed. The prediction process has finished.")
-                print(str(idRequest))
+                logger.info("File queue of prediction idRequest removed. The prediction process has finished.")
+                logger.info(str(idRequest))
             else:
-                print("The file queue of prediction idRequest to remove does not exist")
+                logger.info("The file queue of prediction idRequest to remove does not exist")
     
-            freeAlgorithm=True #################real
-        #freeAlgorithm=True
+            freeAlgorithm=True
