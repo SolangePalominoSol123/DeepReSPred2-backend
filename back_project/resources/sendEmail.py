@@ -91,7 +91,7 @@ class SendEmailResource(Resource):
         self.createDir(mainDir)
 
         if(lenRows<=0):
-            return
+            return mainDir
 
         #fasta dataframe
         dfAuxFasta=dfMainData[['subgroup','fasta']].copy()

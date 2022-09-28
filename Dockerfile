@@ -43,8 +43,8 @@ RUN mkdir data && mkdir algPrograms
 
 #--------------------------------------DATABASE--------------------------------------
 WORKDIR /home/data
-#RUN wget https://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pfamA_35.0.tar.gz -o outputPfam.txt
-#RUN tar -xzvf pfamA_35.0.tar.gz
+RUN wget https://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pfamA_35.0.tar.gz --no-check-certificate -o outputPfam.txt
+RUN tar -xzvf pfamA_35.0.tar.gz
 
 #--------------------------------ALGORITHMS COMPONENTS--------------------------------
 
@@ -170,10 +170,15 @@ RUN sed -i "s/freecontactcmd =.*/freecontactcmd = ${FREECONTACTCMD}/" aln2maps.c
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" aln2maps.csh
 #---------predict_tmscore.sh
 RUN sed -i "s/dmpfolddir=.*/dmpfolddir=${DMPFOLDDIR}/" predict_tmscore.sh
+RUN chmod +x seq2maps.csh
+RUN chmod +x aln2maps.csh
+RUN chmod +x predict_tmscore.sh
+
 #---------bin/runpsipredandsolvwithdb
 WORKDIR /home/algPrograms/DMPfold/bin
 RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithdb
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
+
 
 # Startup to be executable nginx
 #COPY ./nginx-config/startup.sh ./startup.sh

@@ -1,6 +1,6 @@
 from sys import maxsize
 from werkzeug.utils import secure_filename
-from auxiliarFunctionsDaemon import clearDir
+from auxiliarFunctionsDaemon import createDir
 import requests
 import fnmatch
 import subprocess
@@ -174,14 +174,17 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
             regFullAfter=os.path.join(S3_UPLOAD_DIR, secure_filename(registeredFasta))
 
-            shutil.copy(fileFullInput, regFullAfter)
-            posDot=registeredFasta.find(".")
-            #Upload to S3
-            dataInput={
-                "name" : registeredFasta[:posDot],
-                "extension" : registeredFasta[posDot:]
-            }
-            response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            try:
+                shutil.copy(fileFullInput, regFullAfter)
+                posDot=registeredFasta.find(".")
+                #Upload to S3
+                dataInput={
+                    "name" : registeredFasta[:posDot],
+                    "extension" : registeredFasta[posDot:]
+                }
+                response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            except Exception as e:
+                print("Error in resultsManager line 187: "+str(e))
 
             #---------------
 
@@ -204,14 +207,17 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
             regFullAfter=os.path.join(S3_UPLOAD_DIR, secure_filename(registeredPDB))
 
-            shutil.copy(fileFullPDB, regFullAfter)
-            posDot=registeredPDB.find(".")
-            #Upload to S3
-            dataInput={
-                    "name" : registeredPDB[:posDot],
-                    "extension" : registeredPDB[posDot:]
-            }
-            response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            try:
+                shutil.copy(fileFullPDB, regFullAfter)
+                posDot=registeredPDB.find(".")
+                #Upload to S3
+                dataInput={
+                        "name" : registeredPDB[:posDot],
+                        "extension" : registeredPDB[posDot:]
+                }
+                response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            except Exception as e:
+                print("Error in resultsManager line 220: "+str(e))
 
             #-------------------------------
 
@@ -234,14 +240,17 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
             regFullAfter=os.path.join(S3_UPLOAD_DIR, secure_filename(registered21c))
 
-            shutil.copy(fileFull21c, regFullAfter)
-            posDot=registered21c.find(".")
-            #Upload to S3
-            dataInput={
-                    "name" : registered21c[:posDot],
-                    "extension" : registered21c[posDot:]
-            }
-            response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            try:
+                shutil.copy(fileFull21c, regFullAfter)
+                posDot=registered21c.find(".")
+                #Upload to S3
+                dataInput={
+                        "name" : registered21c[:posDot],
+                        "extension" : registered21c[posDot:]
+                }
+                response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            except Exception as e:
+                print("Error in resultsManager line 253: "+str(e))
 
             #--------------
 
@@ -264,14 +273,17 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
             regFullAfter=os.path.join(S3_UPLOAD_DIR, secure_filename(registeredMap))
 
-            shutil.copy(fileFullmap, regFullAfter)
-            posDot=registeredMap.find(".")
-            #Upload to S3
-            dataInput={
-                    "name" : registeredMap[:posDot],
-                    "extension" : registeredMap[posDot:]
-            }
-            response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            try:
+                shutil.copy(fileFullmap, regFullAfter)
+                posDot=registeredMap.find(".")
+                #Upload to S3
+                dataInput={
+                        "name" : registeredMap[:posDot],
+                        "extension" : registeredMap[posDot:]
+                }
+                response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+            except Exception as e:
+                print("Error in resultsManager line 286: "+str(e))
 
             #---------------
 
@@ -295,14 +307,17 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
                 regFullAfter=os.path.join(S3_UPLOAD_DIR, secure_filename(registeredAlign))
 
-                shutil.copy(fileFullAlign, regFullAfter)
-                posDot=registeredAlign.find(".")
-                #Upload to S3
-                dataInput={
-                        "name" : registeredAlign[:posDot],
-                        "extension" : registeredAlign[posDot:]
-                }
-                response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+                try:
+                    shutil.copy(fileFullAlign, regFullAfter)
+                    posDot=registeredAlign.find(".")
+                    #Upload to S3
+                    dataInput={
+                            "name" : registeredAlign[:posDot],
+                            "extension" : registeredAlign[posDot:]
+                    }
+                    response = requests.post(URL_BACK_END_DEEPRESPRED+"s3file/", json=dataInput)
+                except Exception as e:
+                    print("Error in resultsManager line 320: "+str(e))
             
 
 
@@ -310,9 +325,9 @@ def processingResults(dirPDBAux, dirResults, idRequest):
         group+=1
 
     ############################################ CLEAR ALL
-    clearDir(dirPDBAux)
-    clearDir(dirResults)
-    clearDir(S3_UPLOAD_DIR)
+    createDir(dirPDBAux)
+    createDir(dirResults)
+    createDir(S3_UPLOAD_DIR)
 
 
 """
