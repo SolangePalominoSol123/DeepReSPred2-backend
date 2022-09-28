@@ -180,7 +180,7 @@ RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithd
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
 
 #-----------------LOOGER TO NOHUP DEAMON
-RUN echo '/DeepReSPred-back/back_project/autProcess/nohup.out {'>> /etc/logrotate.conf
+RUN echo '/home/back_project/autProcess/nohup.out {'>> /etc/logrotate.conf
 RUN echo 'size 5M'>> /etc/logrotate.conf
 RUN echo 'copytruncate'>> /etc/logrotate.conf
 RUN echo 'rotate 100'>> /etc/logrotate.conf

@@ -1,0 +1,6 @@
+In this directory logs files of deepResPredDaemon will be store. 
+All logs related to the program are in the following directory:
+
+--->Daemon log: /home/back_project/autProcess/logs_daemon
+--->Prediction process log: /home/back_project/autProcess/nohup.out
+--->Back-end Flask API log: /home/back_project/logs/access_logfile.log && /home/back_project/logs/error_logfile.log

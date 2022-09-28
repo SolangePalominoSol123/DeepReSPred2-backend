@@ -48,7 +48,7 @@ from logging.handlers import RotatingFileHandler
 logging.basicConfig(
   handlers=[
     RotatingFileHandler(
-      './logs_deamon/deepReSPred.log',
+      '/home/back_project/autProcess/logs_daemon/deepReSPred.log',
       maxBytes=10240000,
       backupCount=5
     )
