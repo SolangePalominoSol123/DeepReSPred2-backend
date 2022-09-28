@@ -25,6 +25,8 @@ def clearDir(directory):
 
 def createDir(directory):
     isdir = os.path.isdir(directory) 
+    logger.info('verifying directory: '+directory)
+    logger.info('Result isdir: '+ str(isdir))  
     if isdir:
         clearDir(directory)
     try:
@@ -89,9 +91,11 @@ def validateAndAssignResults(idRequest,pfamID,email, inputType):
 
 def verifyDirOrCreate(directory):
     isdir = os.path.isdir(directory) 
-        
-    if not isdir:        
+    logger.info('verifying directory: '+directory)
+    logger.info('Result isdir: '+ str(isdir))    
+    if not isdir:
         try:
+            logger.info('creating directory: '+directory)
             os.makedirs(directory)
         except:
             logger.error("Error verifying or creating directory: "+directory)

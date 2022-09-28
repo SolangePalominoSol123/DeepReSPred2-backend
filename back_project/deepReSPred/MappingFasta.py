@@ -418,7 +418,8 @@ merged_inner4.head()
 id_seqs = merged_inner4['id'].tolist()
 iniIndexSeq = merged_inner4['iniIndex'].tolist()
 endIndexSeq = merged_inner4['endIndex'].tolist()
-id_seqs[0]
+if len(id_seqs):
+    print(id_seqs[0])
 
 # %%
 counter=0

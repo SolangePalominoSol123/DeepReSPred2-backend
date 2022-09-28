@@ -116,13 +116,15 @@ while True:
 
                 logger.info("IS NOT A PFAM CODE PREDICTION")
                 #Download files
-                createDir(UPLOAD_FOLDER)
+                verifyDirOrCreate(UPLOAD_FOLDER)
                 #Files are in filesInFolder Folder
                 dataInput={
                     "idRequest":actualIdRequest
                 }
                 response = requests.get(URL_BACK_END_DEEPRESPRED+"filexreqInfo/", json=dataInput)
                 rsp=response.json()
+                logger.info("filexreqInfo API: ")
+                logger.info(rsp)
                 if(not rsp["error"]):
                     nameFileInput=rsp["nameFile"]
                     nameFileFullPathInput=os.path.join(UPLOAD_FOLDER, secure_filename(nameFileInput))  #Here is where files are
@@ -152,7 +154,9 @@ while True:
                         logger.info("Converting to Fasta from SeqSto")
                         nameFileFullPathInput=convertSto2Fasta(nameFileFullPathInput)
                     
+                    logger.info("Executing Prediction algorithm")
                     exit_code = subprocess.call(["sh",algorithmPath,nameFileFullPathInput,ALGORITHM_PROCESSING])
+                    logger.info("Ending Prediction algorithm - exit code:")
                     logger.info(exit_code)
             
 
@@ -172,7 +176,7 @@ while True:
 
     if not freeAlgorithm:
         #verify status of algorithm, if the prediction has finished (counting files)
-        logger.info("In a prediction process")
+        logger.info("In a prediction process...")
         dirFasta=os.path.join(ALGORITHM_PROCESSING, secure_filename("target"))
         dirFlags=os.path.join(ALGORITHM_PROCESSING, secure_filename("flagsEnding"))
         dirPDBAux=os.path.join(ALGORITHM_PROCESSING, secure_filename("auxFiles"))
@@ -193,7 +197,7 @@ while True:
         cantFlags=len(fnmatch.filter(os.listdir(dirFlags), '*txt'))
         cantPDBAux=len(fnmatch.filter(os.listdir(dirPDBAux), '*pdb'))
 
-        if(cantFasta==cantFlags):
+        if(cantFasta>0 and cantFlags>0 and cantFasta==cantFlags):
 
             clearDir(dirFlags)
             clearDir(dirFasta)  #all relevant info are in PDB and results (here also fasta)
