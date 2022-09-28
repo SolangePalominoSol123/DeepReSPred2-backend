@@ -30,6 +30,7 @@ jupyter-client==7.0.2
 jupyter-core==4.7.1
 keyring==23.2.1
 keyrings.alt==4.1.0
+logging==0.4.9.6 #------------------new
 multidict==5.2.0
 mysqlclient==2.0.3
 nest-asyncio==1.5.1

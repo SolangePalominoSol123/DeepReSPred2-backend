@@ -40,6 +40,29 @@ from constants import ALGORITHM_FOLDER
 from constants import ALGORITHM_PROCESSING
 from constants import UPLOAD_FOLDER
 
+
+##---------------------------------------LOGGER-----------------
+
+import logging
+from logging.handlers import RotatingFileHandler
+logging.basicConfig(
+  handlers=[
+    RotatingFileHandler(
+      './logs_deamon/deepReSPred.log',
+      maxBytes=10240000,
+      backupCount=5
+    )
+  ],
+  level=logging.INFO,
+  format='%(levelname)s - %(asctime)s ::: f. %(funcName)s - line %(lineno)s ::: %(message)s'
+)
+
+logging.info('Admin logged out')
+logging.warning('Admin logged out')
+logging.error('Admin logged out')
+
+##--------------------------------------------------------------
+
 q = deque()
 
 
@@ -121,6 +144,7 @@ while True:
 
                 print("IS NOT A PFAM CODE PREDICTION")
                 #Download files
+                createDir(UPLOAD_FOLDER)
                 #Files are in filesInFolder Folder
                 dataInput={
                     "idRequest":actualIdRequest
@@ -146,6 +170,8 @@ while True:
                             print("new namefile: "+ newNameFileInput)
                             fileFasta=os.path.join(destinationDir, secure_filename(newNameFileInput))
                             shutil.copy(fileTxt, fileFasta)
+                            nameFileFullPathInput=fileFasta
+                            os.remove(fileTxt)
 
                     if(typeInput=="seqSto"):
                         #convert to fasta
