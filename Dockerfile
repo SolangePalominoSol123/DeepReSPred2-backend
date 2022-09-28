@@ -180,7 +180,7 @@ RUN sed -i "s/dmpfolddir =.*/dmpfolddir = ${DMPFOLDDIR}/" runpsipredandsolvwithd
 RUN sed -i "s/ncbidir =.*/ncbidir = ${NCBIDIR}/" runpsipredandsolvwithdb
 
 #-----------------LOOGER TO NOHUP DEAMON
-RUN echo '/home/back_project/autProcess/nohup.out {'>> /etc/logrotate.conf
+RUN echo '/home/back_project/autProcess/nohup.out /home/back_project/autProcess/logs_daemon/deepReSPred.log {'>> /etc/logrotate.conf
 RUN echo 'size 5M'>> /etc/logrotate.conf
 RUN echo 'copytruncate'>> /etc/logrotate.conf
 RUN echo 'rotate 100'>> /etc/logrotate.conf
@@ -190,7 +190,6 @@ RUN echo '}'>> /etc/logrotate.conf
 COPY ./logrotate /etc/cron.hourly
 WORKDIR /etc/cron.hourly
 RUN chmod +x logrotate
-
 
 # Startup to be executable nginx
 #COPY ./nginx-config/startup.sh ./startup.sh
