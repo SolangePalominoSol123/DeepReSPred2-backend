@@ -68,6 +68,12 @@ for file in $dirAux/target/*.fasta; do
         counter=$((counter+1))
 done
 
+if [ $counter -eq 0 ]; then
+    echo "run_repeat_prediction.sh::: No fasta files founded."
+    echo "-------------------"
+    exit 1
+fi
+
 echo ""
 echo ""
 

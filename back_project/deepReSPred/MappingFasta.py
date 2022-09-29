@@ -449,7 +449,7 @@ dfSinEstructuras2
 # %%
 #generar archivos
 df2fastaIndividual(dfSinEstructuras2, 1) 
-os.remove(filename)
+#os.remove(filename)
 # %%
 #Descargando PDB de la secuencia con los fragmentos con estructura
 if len(PDBCodeStructure)>0:

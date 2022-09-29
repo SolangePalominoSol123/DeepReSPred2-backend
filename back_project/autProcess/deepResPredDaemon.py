@@ -27,12 +27,6 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-previousIdRequest=""
-actualIdRequest=""
-freeAlgorithm=True
-timeIni=0
-timeFin=0
-
 #this import is after because this file is in a subdirectory
 from constants import DAEMON_QUEUE_FOLDER
 from constants import URL_BACK_END_DEEPRESPRED
@@ -44,6 +38,12 @@ from constants import UPLOAD_FOLDER
 ##---------------------------------------LOGGER-----------------
 from base_logger import logger
 ##--------------------------------------------------------------
+
+previousIdRequest=""
+actualIdRequest=""
+freeAlgorithm=True
+timeIni=0
+timeFin=0
 
 q = deque()
 
@@ -140,7 +140,7 @@ while True:
                             posDot=nameFileInput.find(".")
                             logger.info(nameFileInput)
                             logger.info(posDot)
-                            newNameFileInput=nameFileInput[:posDot]+".fasta"
+                            newNameFileInput="is_"+nameFileInput[:posDot]+".fasta"
                             logger.info("new namefile: "+ newNameFileInput)
                             fileFasta=os.path.join(destinationDir, secure_filename(newNameFileInput))
                             shutil.copy(fileTxt, fileFasta)

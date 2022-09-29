@@ -35,7 +35,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
     dirResults_list = os.listdir(dirResults)
     for dirResult in dirResults_list:
         dirResult_full=os.path.join(dirResults, secure_filename(dirResult)) #dir ../results/test_seq*/
-        logger.info("\n------------------------------------------------------")
+        logger.info("------------------------------------------------------")
         logger.info("Current dir: "+dirResult_full)
         logger.info("Subgroup: "+str(group))
 
@@ -55,11 +55,16 @@ def processingResults(dirPDBAux, dirResults, idRequest):
         listFiles21c=fnmatch.filter(os.listdir(dirResult_full), '*.21c')
         listFilesMap=fnmatch.filter(os.listdir(dirResult_full), '*.map')
 
+        logger.info("N° files is_*.fasta: "+ str(len(listFilesInputIS)))
+        logger.info("N° files nr_*.fasta: "+ str(len(listFilesInputNR)))
+        logger.info("N° dir output: "+ str(len(dirFilesResult)))
+
         maxGen=0
         #Is a fragment, not a complete sequence
         if len(listFilesInputIS)>0: 
-            logger.info("\nEvaluating a fragment...")
+            logger.info("Evaluating a fragment...")
             listFilesResults=fnmatch.filter(os.listdir(dirFilesResult), 'final_*.pdb')
+            logger.info("listFilesResults: "+str(len(listFilesResults)))
 
             if flagPDBAux:
                 maxGen=0
@@ -122,7 +127,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
 
         #Is a complete sequence
         if len(listFilesInputNR)>0: 
-            logger.info("\nEvaluating a complete sequence...")
+            logger.info("Evaluating a complete sequence...")
             listFilesResults=fnmatch.filter(os.listdir(dirFilesResult), 'final_1.pdb')
 
             if len(listFilesResults)>0:
@@ -155,7 +160,7 @@ def processingResults(dirPDBAux, dirResults, idRequest):
             logger.info("ID Request: "+str(idRequest))
             logger.info("----------")
 
-            logger.info("\nSaving data to DB and S3 bucket...")
+            logger.info("Saving data to DB and S3 bucket...")
             #Fasta
             posDot=fileFullInput.find(".")
             dataInput={
