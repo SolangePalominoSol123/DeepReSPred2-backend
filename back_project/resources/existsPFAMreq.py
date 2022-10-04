@@ -28,12 +28,14 @@ class ExistsPFAMreqResource(Resource):
             reqAux.totalTimeProcess=total_seconds
             reqAux.idStatus=4
             db.session.commit()
-
-            infoFilesxReq=db.session.query(Filexreq.idFile).filter(Filexreq.idRequest==idRequest_Aux).filter( Filexreq.isResult==True).all()
+            
+            infoFilesxReq=db.session.query(Filexreq.idFile, Filexreq.isResult).filter(Filexreq.idRequest==idRequest_Aux).all()
+            #infoFilesxReq=db.session.query(Filexreq.idFile).filter(Filexreq.idRequest==idRequest_Aux).filter( Filexreq.isResult==True).all()
+            
             for infoFileAux in infoFilesxReq:
                 
                 newFilexReq=Filexreq(
-                    isResult=True,
+                    isResult=infoFileAux.isResult,
                     idFile=infoFileAux.idFile,
                     idRequest=idRequest
                 )
